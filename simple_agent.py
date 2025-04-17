@@ -34,7 +34,7 @@ graph = graph_builder.compile()
 # Main interaction loop
 while True:
     user_input = input("User: ")
-    if user_input.lower() in ["quit", "exit", "q"]:
+    if user_input.lower() in ["quit", "exit", "q", ""]:
         print("Goodbye!")
         break
     for event in graph.stream({"messages": ("user", user_input)}):
