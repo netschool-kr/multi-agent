@@ -33,10 +33,10 @@ graph = graph_builder.compile()
 
 # Main interaction loop
 while True:
-    user_input = input("사용자: ")
+    user_input = input("User: ")
     if user_input.lower() in ["quit", "exit", "q"]:
         print("Goodbye!")
         break
     for event in graph.stream({"messages": ("user", user_input)}):
         for value in event.values():
-            print("에이전트:", value["messages"][-1].content)
+            print("Agent:", value["messages"][-1].content)
