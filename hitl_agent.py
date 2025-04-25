@@ -2,15 +2,12 @@ from dotenv import load_dotenv
 load_dotenv()
 import sqlite3
 from langgraph.graph import StateGraph, START, END
-from langgraph.checkpoint.sqlite import SqliteSaver  # SQLite 기반 체크포인트
+from langgraph.checkpoint.sqlite import SqliteSaver  # SQLite-based checkpoint
 from utils import show_graph
 
-# (Postgres 사용 시: from langgraph.checkpoint.postgres import PostgresSaver)
+# (For Postgres: from langgraph.checkpoint.postgres import PostgresSaver)
 
-# 1. 상태 정의: 예시로 'result'와 'approved' 키를 상태로 사용
-# class State(dict):  # TypedDict를 사용해도 무방
-#     result: str
-#     approved: bool
+# 1. Define the state: using 'result' and 'approved' keys as example
 from pydantic import BaseModel
 from typing import Optional
 
@@ -19,75 +16,73 @@ class State(BaseModel):
     result: Optional[str] = None    # default None (no result yet)
     approved: bool = False          # default False (not approved yet)
 
-# 2. 단계별 처리 로직 정의
+# 2. Define step-by-step processing logic
 def ai_decision(state: State) -> State:
-    state.result = "분류 결과: 정상"
+    state.result = "Classification result: normal"
     state.approved = False
-    print("AI 결정 완료:", state.result)
+    print("AI decision completed:", state.result)
     return state
 
 
 def human_review(state: State) -> State:
-    """Human-in-the-loop 단계: 사용자에게 AI 결정 내용 확인 및 승인받음"""
-    print(f"AI 결정 내용: {state.result}")  # state["result"] -> state.result
-    user_input = input("이 결정을 승인할까요? (yes/no): ").strip().lower()
+    """Human-in-the-loop step: present AI decision to the user for review and approval"""
+    print(f"AI decision result: {state.result}")
+    user_input = input("Do you approve this decision? (yes/no): ").strip().lower()
     if user_input == "yes":
-        state.approved = True  # state["approved"] -> state.approved
-        print(">> 사용자 승인 완료")
+        state.approved = True
+        print(">> User approval completed")
     else:
-        state.approved = False  # state["approved"] -> state.approved
-        correction = input("수정할 결과를 입력해주세요: ")
-        state.result = correction  # state["result"] -> state.result
-        state.approved = True  # state["approved"] -> state.approved
-        print(">> 사용자 수정 완료, 결과 승인됨")
+        state.approved = False
+        correction = input("Please enter the corrected result: ")
+        state.result = correction
+        state.approved = True
+        print(">> User correction completed, result approved")
     return state
 
 
 def final_step(state: State) -> State:
-    if state.approved:  # state.get("approved") -> state.approved
-        print("최종 결과:", state.result)  # state["result"] -> state.result
+    if state.approved:
+        print("Final result:", state.result)
     else:
-        print("최종 결과가 승인되지 않아 프로세스를 중단합니다.")
+        print("Final result not approved; terminating process.")
     return state
 
-# 3. 그래프 구성: 노드 추가 및 연결
+# 3. Construct the graph: add nodes and edges
 builder = StateGraph(State)
 builder.add_node("ai_decision", ai_decision)
 builder.add_node("human_review", human_review)
 builder.add_node("final_step", final_step)
-builder.add_edge(START, "ai_decision")       # 시작 -> AI 결정
-builder.add_edge("ai_decision", "human_review")  # AI 결정 -> 인간 검토
-builder.add_edge("human_review", "final_step")   # 인간 검토 -> 최종 단계
-builder.add_edge("final_step", END)          # 종료
+builder.add_edge(START, "ai_decision")         # start -> AI decision
+builder.add_edge("ai_decision", "human_review")  # AI decision -> human review
+builder.add_edge("human_review", "final_step")   # human review -> final step
+builder.add_edge("final_step", END)            # end
 
-# 4. 체크포인터 설정: SQLite 사용 (':memory:'는 메모리DB, 파일경로 지정 가능)
-conn = sqlite3.connect(":memory:", check_same_thread=False)  # 메모리 DB에 연결
-checkpointer = SqliteSaver(conn)  # Connection 객체로 SqliteSaver 생성
-#checkpointer = SqliteSaver.from_conn_string(":memory:")
+# 4. Configure checkpointer: using SQLite (':memory:' for in-memory DB, or specify file path)
+conn = sqlite3.connect(":memory:", check_same_thread=False)  # connect to in-memory DB
+checkpointer = SqliteSaver(conn)  # create SqliteSaver with the connection object
 graph = builder.compile(checkpointer=checkpointer)
 show_graph(graph)
 
-# **체크포인트 초기화**: SQLite의 경우 처음 한 번 .setup() 필요할 수 있음
+# **Checkpoint initialization**: .setup() may be needed once for SQLite
 try:
-    checkpointer.setup()  # PostgreSQL 사용 시 데이터베이스 테이블 생성
-except Exception as e:
-    pass  # 이미 초기화된 경우 발생하는 오류 무시
+    checkpointer.setup()  # create tables when using PostgreSQL
+except Exception:
+    pass  # ignore if already initialized
 
-# 5. 그래프 실행 with Human-in-the-loop (HITL)
+# 5. Execute the graph with Human-in-the-loop (HITL)
 thread_config = {"configurable": {"thread_id": "demo1"}}
-print("=== 그래프 실행 시작 ===")
-initial_state = {"user_input": "사용자 입력 예시", "result": None, "approved": False}
+print("=== Starting graph execution ===")
+initial_state = {"user_input": "example user input", "result": None, "approved": False}
 
-# 첫 번째 노드부터 human_review 직전까지 실행 (human_review에서 Interrupt 예상)
+# Run up to human_review (expect pause at human_review)
 for event in graph.stream(initial_state, thread_config, stream_mode="values"):
     print(event)
-    # 체크포인트는 각 노드 실행 후 자동 저장됨
-    pass  # event 출력 생략 (ai_decision 단계 완료)
+    # checkpoint is auto-saved after each node execution
+    pass
 
-# human_review 단계: 사용자 입력 대기 중 (그래프 일시 정지 상태)
-# 사용자가 input을 통해 승인 여부를 결정하면, human_review 노드가 완료되고 상태 저장
+# human_review step: waiting for user approval input
 
-# 그래프 재개: human_review 이후 remaining 노드(final_step) 실행
+# Resume graph to execute remaining node(s) after human_review (final_step)
 for event in graph.stream(None, thread_config, stream_mode="values"):
-    pass  # final_step 단계 실행하여 결과 출력
-print("=== 그래프 실행 종료 ===")
+    pass  # execute final_step to output result
+print("=== Graph execution finished ===")
