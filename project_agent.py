@@ -141,9 +141,9 @@ builder.add_node("summarize_agent", summarize_agent)
 
 # Add edges: Supervisor orchestrates the entire workflow
 builder.add_edge(START, "supervisor")
-builder.add_edge("supervisor", "brainstorm_agent")
-builder.add_edge("supervisor", "research_agent")
-builder.add_edge("supervisor", "summarize_agent")
+#builder.add_edge("supervisor", "brainstorm_agent")
+#builder.add_edge("supervisor", "research_agent")
+#builder.add_edge("supervisor", "summarize_agent")
 builder.add_edge("brainstorm_agent", "supervisor")
 builder.add_edge("research_agent", "supervisor")
 builder.add_edge("summarize_agent", "supervisor")
