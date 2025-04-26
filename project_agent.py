@@ -12,6 +12,7 @@ import sqlite3
 from langgraph.types import Command
 from langgraph.checkpoint.sqlite import SqliteSaver  # SQLite-based checkpoint
 from utils import show_graph
+import os
 
 class IdeaState(BaseModel):
     topic: str                       # idea topic provided by the user
@@ -170,6 +171,7 @@ async def main():
         state0 = {"topic": "Artificial Intelligence"}
         result = await graph.ainvoke(state0, config)
         print(result)
+        os._exit(0)
     except AttributeError as e:
         print(f"AttributeError occurred: {e}")
 
