@@ -119,4 +119,59 @@ def supervisor(state: IdeaState) -> Command[
     # If no ideas have been generated yet, start with brainstorming
     if not state.ideas:
         return Command(goto="brainstorm_agent")
-    # If ideas exist but research
+    # If ideas exist but research hasn't been done, go to research step
+    elif state.ideas and not state.research:
+        # If idea count is zero, end immediately
+        if len(state.ideas) == 0:
+            return Command(goto=END)
+        return Command(goto="research_agent")
+    # If research is complete and summary isn't, go to summarization
+    elif state.research and not state.summary:
+        return Command(goto="summarize_agent")
+    else:
+        # All steps complete or termination condition
+        return Command(goto=END)
+
+# Build the graph and register nodes (Supervisor and each agent)
+builder = StateGraph(IdeaState)
+builder.add_node("supervisor", supervisor)
+builder.add_node("brainstorm_agent", brainstorm_agent)
+builder.add_node("research_agent", research_agent)
+builder.add_node("summarize_agent", summarize_agent)
+
+# Add edges: Supervisor orchestrates the entire workflow
+builder.add_edge(START, "supervisor")
+builder.add_edge("supervisor", "brainstorm_agent")
+builder.add_edge("supervisor", "research_agent")
+builder.add_edge("supervisor", "summarize_agent")
+builder.add_edge("brainstorm_agent", "supervisor")
+builder.add_edge("research_agent", "supervisor")
+builder.add_edge("summarize_agent", "supervisor")
+
+import aiosqlite
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+
+async def init_checkpointer():
+    # Create asynchronous checkpointer
+    conn = await aiosqlite.connect(":memory:")
+    return AsyncSqliteSaver(conn)
+
+async def main():
+    checkpointer = await init_checkpointer()
+    graph = builder.compile(checkpointer=checkpointer)
+    try:
+        # Execute workflow (thread_id is required)
+        thread_id = "idea1"
+        config = {
+            "configurable": {"thread_id": thread_id},
+            "recursion_limit": 100
+        }
+        # Set initial topic
+        state0 = {"topic": "Artificial Intelligence"}
+        result = await graph.ainvoke(state0, config)
+        print(result)
+    except AttributeError as e:
+        print(f"AttributeError occurred: {e}")
+
+asyncio.run(main())
+
