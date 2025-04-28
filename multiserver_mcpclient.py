@@ -5,51 +5,55 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import os
-# from src_langgraph.utils import show_graph
+#from src_langgraph.utils import show_graph
 
-# Load environment variables from .env file
 load_dotenv()
 if os.environ.get("EXEC_ENV") == "vscode":
-    # If running inside VSCode (base: src folder)
+    # run in VSCode
     server_script_path = "./"
-    python_command = "C:\\Users\\user\\anaconda3\\envs\\langgraph-mcp\\python.exe"
+    python_command="C:\\Users\\user\\anaconda3\\envs\\langgraph-mcp\\python.exe"
 else:
-    # If running from a DOS shell (base: project root)
+    # run in DOS
     server_script_path = "./"
-    python_command = "python"
-# Example queries:
+    python_command="python"
+# Example query
 # "What is weather in newyork"
 # "What is FastMCP?"
 # "summarize this youtube video in 50 words, here is a video link: https://www.youtube.com/watch?v=2f3K43FHRKo"
 query = input("Query:")
 
-# Define LLM
+# Define llm
 model = ChatOpenAI(model="gpt-4o")
 
-# Define and run MCP-connected agent
+# Define MCP servers
 async def run_agent():
     async with MultiServerMCPClient(
         {
             "tavily": {
                 "command": python_command,
-                "args": [server_script_path + "tavily_search.py"],
+                "args": [server_script_path+"tavily_search.py"],
                 "transport": "stdio",
             },
             "youtube_transcript": {
                 "command": python_command,
-                "args": [server_script_path + "yt_transcript.py"],
+                "args": [server_script_path+"yt_transcript.py"],
                 "transport": "stdio",
-            },
+            }, 
             "news_extractor": {
                 "command": python_command,
-                "args": [server_script_path + "news_mcp_server.py"],
+                "args": [server_script_path+"news_mcp_server.py"],
                 "transport": "stdio",
-            },
+            }, 
             "elevenlabs": {
                 "command": python_command,
-                "args": [server_script_path + "elevenlabs_mcp_server.py"],
+                "args": [server_script_path+"elevenlaps_mcp_server.py"],
                 "transport": "stdio",
             },
+            
+            # "weather": {
+            # "url": "http://localhost:8000/sse", # start your weather server on port 8000
+            # "transport": "sse",
+            # }
         }
     ) as client:
         # Load available tools
@@ -58,8 +62,8 @@ async def run_agent():
         # show_graph(agent)
         # Add system message
         system_message = SystemMessage(content=(
-            "You have access to multiple tools that can help answer queries. "
-            "Use them dynamically and efficiently based on the user's request. "
+                "You have access to multiple tools that can help answer queries. "
+                "Use them dynamically and efficiently based on the user's request. "
         ))
 
         # Process the query
@@ -81,7 +85,7 @@ async def run_agent():
                 return response_content
         except Exception as e:
             return f"Error processing response: {str(e)}"
-
+        
 # Run the agent
 if __name__ == "__main__":
     response = asyncio.run(run_agent())
