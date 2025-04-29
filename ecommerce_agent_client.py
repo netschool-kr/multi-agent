@@ -1,12 +1,12 @@
-# ecommerce_agent_client.py - MCP 클라이언트 및 LangGraph 에이전트 설정
+# ecommerce_agent_client.py - MCP Client and LangGraph Agent Setup
 import os
 from dotenv import load_dotenv, find_dotenv
 
-# .env 파일에서 OPENAI_API_KEY로드
+# Load OPENAI_API_KEY from .env file
 load_dotenv(find_dotenv())
 openai_api_key = os.getenv('OPENAI_API_KEY')
 
-# OpenAI API 키 설정
+# Configure OpenAI API key
 import openai
 openai.api_key = openai_api_key
 
@@ -15,43 +15,43 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from langchain_mcp_adapters.tools import load_mcp_tools
 from langgraph.prebuilt import create_react_agent
-from langchain_openai import ChatOpenAI  # OpenAI GPT-4 모델 (LangChain OpenAI wrapper)
-from src_langgraph.utils import show_graph
+from langchain_openai import ChatOpenAI  # OpenAI GPT-4 model (LangChain OpenAI wrapper)
+from utils import show_graph
 
-# 실행 환경에 따라 경로 설정
+# Set paths based on execution environment
 if os.environ.get("EXEC_ENV") == "vscode":
-    # VSCode에서 실행 중일 경우 (src 폴더 기준)
+    # If running in VSCode (relative to src folder)
     server_script = "./src_langgraph_mcp/ecommerce_service_server.py"
-    python_command="C:\\Users\\user\\anaconda3\\envs\\langgraph-mcp\\python.exe"
+    python_command = "C:\\Users\\user\\anaconda3\\envs\\langgraph-mcp\\python.exe"
 else:
-    # DOS 창에서 실행 중일 경우 (루트 디렉토리 기준)
+    # If running in a DOS terminal (root directory)
     server_script = "./ecommerce_service_server.py"
-    python_command="python"
+    python_command = "python"
 
 async def main():
-    # 1. MCP 서버 프로세스를 STDIO 모드로 실행하기 위한 파라미터 설정
+    # 1. Set parameters to run MCP server process in STDIO mode
     server_params = StdioServerParameters(
         command=python_command,
-        args=[server_script]  # MCP 서버 스크립트 경로
+        args=[server_script]  # Path to MCP server script
     )
-    # 2. MCP 서버에 STDIO 클라이언트로 접속하여 세션 시작 
+    # 2. Connect to MCP server as STDIO client and start session
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(read, write) as session:
-            # 3. MCP 세션 초기화 (서버와 초기 메타데이터 교환)
+            # 3. Initialize MCP session (exchange initial metadata with server)
             await session.initialize()
-            # 4. 서버로부터 사용 가능한 툴 목록 불러오기 
+            # 4. Load list of available tools from the server
             tools = await load_mcp_tools(session)
-            # 5. LLM 모델과 툴을 포함한 LangGraph 에이전트 생성
-            model = ChatOpenAI(model="gpt-4")  # GPT-4 모델 인스턴스 (API 키 필요)
+            # 5. Create a LangGraph agent with LLM model and tools
+            model = ChatOpenAI(model="gpt-4")  # OpenAI GPT-4 model instance (requires API key)
             agent = create_react_agent(model, tools)
             show_graph(agent)
-            # 6. 에이전트를 이용하여 사용자 질의 처리 
-            query = {"messages": "재고 있는 저렴한 노트북 추천해줘"}
+            # 6. Handle user query using the agent
+            query = {"messages": "Recommend affordable laptops that are in stock"}
             result = await agent.ainvoke(query)
-            # 7. 결과 출력 
+            # 7. Print the results
             for message in result["messages"]:
                 print(message.content)
 
-# 비동기 함수 실행
+# Execute the async function
 if __name__ == "__main__":
     asyncio.run(main())
