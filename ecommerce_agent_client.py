@@ -46,7 +46,7 @@ async def main():
             agent = create_react_agent(model, tools)
             show_graph(agent)
             # 6. Handle user query using the agent
-            query = {"messages": "Recommend affordable laptops that are in stock"}
+            query = {"messages": "Recommend an inexpensive laptop that is in stock." }
             result = await agent.ainvoke(query)
             # 7. Print the results
             for message in result["messages"]:
