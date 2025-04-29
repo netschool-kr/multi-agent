@@ -83,4 +83,15 @@ async def main():
             graph.add_edge("search_node", "answer_node")
             graph.add_edge("answer_node", END)
             graph = graph.compile()
-            #
+            # 7. Example graph execution
+            user_question = "What will the weather be like in Seoul tomorrow?"
+            initial_state = {"user_input": user_question}
+            result_state = await graph.ainvoke(initial_state)
+            # 8. Output the results
+            print("Question:", user_question)
+            print("Search results summary:", result_state.get("search_results"))
+            print("Answer:", result_state.get("final_answer"))
+
+# Execute the asynchronous main function
+if __name__ == "__main__":
+    asyncio.run(main())
