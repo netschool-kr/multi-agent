@@ -14,8 +14,8 @@ def get_transcript(video_url: str) -> str:
         # Extract the video ID from the URL (supports youtu.be short URLs or v= parameter)
         match = re.search(r"(?:v=|youtu\.be/)([^&/\n?]+)", video_url)
         video_id = match.group(1) if match else video_url  # Assume input is ID if no match
-        # Retrieve transcript segments via YouTubeTranscriptApi (preferring Korean, fallback to English)
-        transcript_list = YouTubeTranscriptApi.get_transcript(video_id, languages=['ko', 'en'])
+        # Retrieve transcript segments via YouTubeTranscriptApi (preferring English)
+        transcript_list = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
         # Concatenate each segment's 'text' field into a single string
         transcript_text = " ".join(seg['text'] for seg in transcript_list)
         return transcript_text
