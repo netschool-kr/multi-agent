@@ -21,7 +21,7 @@ from utils import show_graph
 # Set paths based on execution environment
 if os.environ.get("EXEC_ENV") == "vscode":
     # If running in VSCode (relative to src folder)
-    server_script = "./src_langgraph_mcp/ecommerce_service_server.py"
+    server_script = "./ecommerce_service_server.py"
     python_command = "C:\\Users\\user\\anaconda3\\envs\\langgraph-mcp\\python.exe"
 else:
     # If running in a DOS terminal (root directory)
