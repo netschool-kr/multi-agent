@@ -49,14 +49,15 @@ def compute_ma_node(state: ForexState) -> ForexState:
     sw, lw = state["short_window"], state["long_window"]
     # Short moving average
     if len(prices) >= sw:
-        state["short_ma"] = sum(prices[-sw:]) / sw
+        state["short_ma"] = sum(map(float, prices[-sw:])) / sw
     else:
-        state["short_ma"] = sum(prices) / len(prices) if prices else 0.0
+        state["short_ma"] = sum(map(float, prices)) / len(prices)  # 데이터가 부족하면 이용 가능한 전체 평균
     # Long moving average
     if len(prices) >= lw:
-        state["long_ma"] = sum(prices[-lw:]) / lw
+        state["long_ma"] = sum(map(float, prices[-lw:])) / lw
     else:
-        state["long_ma"] = sum(prices) / len(prices) if prices else 0.0
+        state["long_ma"] = sum(map(float, prices)) / len(prices)
+        
     return state
 
 def signal_check_node(state: ForexState) -> ForexState:
