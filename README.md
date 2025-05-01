@@ -41,7 +41,7 @@ pip install -r requirements.txt
    OPENAI_API_KEY=your-openai-key-here
    For other services (e.g., TAVILY_API_KEY), set similarly.
 
-##Running the Examples
+## Running the Examples
 Each example is a standalone Python script demonstrating a specific concept. Activate your virtual environment and run:
 
 python simple_agent.py
@@ -49,7 +49,7 @@ This will start an interactive console session. Type as the User, and the Agent 
 
 To exit, press Ctrl+C or use the agent’s built-in exit command (if provided).
 
-##Repository Structure and Chapter Mapping
+## Repository Structure and Chapter Mapping
 | Chapter | Description                                       | Script(s)                              |
 |---------|---------------------------------------------------|----------------------------------------|
 | 2       | Getting Started with LangGraph                    | `simple_agent.py`                      |
