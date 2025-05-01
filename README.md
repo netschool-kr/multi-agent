@@ -41,10 +41,24 @@ pip install -r requirements.txt
    OPENAI_API_KEY=your-openai-key-here
    For other services (e.g., TAVILY_API_KEY), set similarly.
 
-Running the Examples
+##Running the Examples
 Each example is a standalone Python script demonstrating a specific concept. Activate your virtual environment and run:
 
 python simple_agent.py
 This will start an interactive console session. Type as the User, and the Agent will respond.
 
 To exit, press Ctrl+C or use the agent’s built-in exit command (if provided).
+
+##Repository Structure and Chapter Mapping
+Chapter	Description	Script(s)
+2	Getting Started with LangGraph	simple_agent.py
+5	LangGraph Core Concepts	basic_flow.py
+6	State Management and Memory	memory_agent.py, memory.py
+7	Human-in-the-Loop Workflows	hitl_agent.py
+8	Multi-Agent Collaboration	two_qa_agent.py, project_agent.py
+9	Integrating External Tools with MCP	user_db_server.py, user_db_client.py
+10	Building a LangGraph Agent System with MCP	forex_server.py, forex_client.py, finance.py
+11	Building Custom Tool Servers (FastMCP)	tavily_search.py, yt_transcript.py, multiserver_mcpclient.py, news_mcp_server.py, news_summarize.py
+12	Deploying an Interactive Chatbot	chatbot_server.py, chatbot_client.py, chatbot_server_sse.py, chatbot_client_sse.py, asyncio_exam.py
+13	E-Commerce Agent Case Study	ecommerce_service_server.py, ecommerce_agent_client.py
+–	Utilities and Helpers	utils.py, checkpoint.py, perplexity.py, pdf.py
