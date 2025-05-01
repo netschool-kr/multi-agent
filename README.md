@@ -29,3 +29,22 @@ To run the examples, you’ll need a Python 3 environment with the required libr
    ```bash
    git clone https://github.com/netschool-kr/multi-agent.git
    cd multi-agent
+
+3. Create a Virtual Environment (optional)
+   python -m venv venv
+   source venv/bin/activate   # On Windows: venv\Scripts\activate
+   
+4. Install Dependencies
+pip install -r requirements.txt
+
+5. Configure API Keys to .env file
+   OPENAI_API_KEY=your-openai-key-here
+   For other services (e.g., TAVILY_API_KEY), set similarly.
+
+Running the Examples
+Each example is a standalone Python script demonstrating a specific concept. Activate your virtual environment and run:
+
+python simple_agent.py
+This will start an interactive console session. Type as the User, and the Agent will respond.
+
+To exit, press Ctrl+C or use the agent’s built-in exit command (if provided).
