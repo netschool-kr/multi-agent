@@ -1,4 +1,4 @@
-This repository contains the code for the LangGraph-based AI agent development project introduced in the book “Building Multi-Agent AI Systems: Workflow Orchestration with LangGraph and MCP” Through this project, you’ll get hands-on practice building AI systems for business automation using the LangGraph framework. By following the example scripts, you’ll create your own AI agents and implement step-by-step features for dialogue handling and workflow automation.
+This repository contains the code for the LangGraph-based AI agent development project introduced in the book “Building Multi-Agent AI Systems: Workflow Orchestration with LangGraph and MCP” Through this project, you’ll get hands-on practice building AI systems for business automation using the LangGraph framework and MCP. By following the example scripts, you’ll create your own AI agents and implement step-by-step features for dialogue handling and workflow automation.
 
 Installation
 To run the examples, you’ll need a Python environment and all required libraries. Follow these steps:
