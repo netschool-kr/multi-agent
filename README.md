@@ -64,4 +64,20 @@ To exit, press Ctrl+C or use the agent’s built-in exit command (if provided).
 | 13      | E-Commerce Agent Case Study                       | `ecommerce_service_server.py`, `ecommerce_agent_client.py` |
 | –       | Utilities and Helpers                             | `utils.py`, `checkpoint.py`, `perplexity.py`, `pdf.py` |
 
+## Notes on LangGraph and MCP
+LangGraph
+Define agent workflows as directed graphs of states and transitions. Nodes represent actions or decisions; edges control flow. LangGraph handles state tracking and execution, allowing you to focus on each step’s logic.
 
+MCP (Model Context Protocol)
+A JSON-RPC based protocol for AI agents to call external tools. FastMCP makes it easy to turn Python functions into tool endpoints. MCP decouples agent logic from tool implementation, enabling plug-and-play integrations.
+
+## Conclusion
+This README has provided an overview of the repository and how it ties into Building Multi-Agent AI Systems. You now have:
+
+A clear path from a simple echo chatbot to a sophisticated, tool-using multi-agent AI system.
+
+Code for each major milestone, organized by chapter.
+
+Setup instructions and notes to get the most out of LangGraph and MCP.
+
+Clone the repo, set up your environment, and dive into the code. Happy building, and enjoy orchestrating your own multi-agent AI workflows!
